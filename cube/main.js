@@ -52,7 +52,7 @@ function loadShader(gl, source, type) {
 	return shader;
 }
 
-require(["domReady", "gl-matrix", "text!vertex.glsl", "text!fragment.glsl"], function(domReady, matrix, vertexSource, fragmentSource) {
+require(["lib/domReady", "lib/gl-matrix", "lib/text!vertex.glsl", "lib/text!fragment.glsl"], function(domReady, matrix, vertexSource, fragmentSource) {
 	const canvas = document.getElementById("canvas");
 	canvas.width = window.innerWidth;
 	canvas.height = window.innerHeight;

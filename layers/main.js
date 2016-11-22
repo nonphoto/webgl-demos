@@ -71,7 +71,7 @@ function loadShader(gl, source, type) {
 	return shader;
 }
 
-require(["domReady", "text!vertex.glsl", "text!red-circle.glsl", "text!green-circle.glsl", "text!blue-circle.glsl"], function(domReady, vertexSource, redSource, greenSource, blueSource) {
+require(["lib/domReady", "lib/text!vertex.glsl", "lib/text!red-circle.glsl", "lib/text!green-circle.glsl", "lib/text!blue-circle.glsl"], function(domReady, vertexSource, redSource, greenSource, blueSource) {
 	const image = document.getElementById("image");
 	const canvas = document.getElementById("canvas");
 	canvas.width = width;
