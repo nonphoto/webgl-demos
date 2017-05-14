@@ -1,4 +1,4 @@
-const positions = [
+const vertexPositions = [
 	-1, -1, 0,
 	-1, 1, 0,
 	1, -1, 0,
@@ -49,7 +49,7 @@ require(["lib/domReady", "lib/gl-matrix", "lib/text!vertex.glsl", "lib/text!frag
 	gl.clearColor(0.5, 0.5, 0.5, 1.0);
 
 	var t0 = Date.now();
-	
+
 	const viewMatrix = matrix.mat4.create();
 	matrix.mat4.translate(viewMatrix, viewMatrix, matrix.vec3.fromValues(0, 0, 0));
 	matrix.mat4.invert(viewMatrix, viewMatrix);
@@ -60,14 +60,14 @@ require(["lib/domReady", "lib/gl-matrix", "lib/text!vertex.glsl", "lib/text!frag
 
 	const vertexBuffer = gl.createBuffer();
 	gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
-	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), gl.STATIC_DRAW);
+	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertexPositions), gl.STATIC_DRAW);
 
 	function draw() {
 		gl.clear(gl.COLOR_BUFFER_BIT);
-	
+
 		gl.uniformMatrix4fv(viewMatrixUniform, false, new Float32Array(viewMatrix));
 
-		gl.uniform2f(resolutionUniform, 800.0, 600.0);
+		gl.uniform2f(resolutionUniform, canvas.width, canvas.height);
 
 		gl.enableVertexAttribArray(vertexPositionAttribute);
 		gl.vertexAttribPointer(vertexPositionAttribute, 3, gl.FLOAT, false, 0, 0);
