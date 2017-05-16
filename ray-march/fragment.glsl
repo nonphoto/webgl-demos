@@ -3,21 +3,29 @@ precision mediump float;
 uniform mat4 viewMatrix;
 uniform vec2 resolution;
 
-bool sphere(in vec3 ro, in vec3 rd, in vec3 p, in float l) {
+const float kd = 0.9;
+const float ka = 0.1;
+
+const vec3 LIGHT_CENTER = vec3 (0.0, 10.0, 10.);
+const vec3 SPHERE_CENTER = vec3(0.0, 0.0, 10.0);
+const float SPHERE_RADIUS = 2.0;
+
+float sphereDistance(in vec3 ro, in vec3 rd, in vec3 p, in float l) {
 	float a = dot(rd, rd);
 	float b = dot(rd, ro - p) * 2.0;
 	float c = dot(p, p) + dot(ro, ro) - (2.0 * dot(p, ro)) - (l * l);
-	float discriminant = (b * b) - (4.0 * a * c);
-	return discriminant > 0.0;
+	float t = (-b - sqrt((b * b) - (4.0 * a * c))) / 2.0 * a;
+	return t;
 }
 
 vec3 directLight(in vec3 ro, in vec3 rd) {
-	if (sphere(ro, rd, vec3(0.0, 0.0, 10.0), 2.0)) {
-		return vec3(1.0, 0.0, 0.0);
-	}
-	else {
-		return vec3(0.0, 0.0, 1.0);
-	}
+	float t = sphereDistance(ro, rd, SPHERE_CENTER, SPHERE_RADIUS);
+	vec3 Q = ro + (t * rd);
+	vec3 N = (Q - SPHERE_CENTER) / SPHERE_RADIUS;
+	vec3 L = normalize(LIGHT_CENTER - Q);
+	float a = dot(N, L);
+	vec3 c = vec3((kd * a) + ka);
+	return c;
 }
 
 void main() {
