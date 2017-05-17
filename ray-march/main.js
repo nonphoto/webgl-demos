@@ -5,6 +5,8 @@ const vertexPositions = [
 	1, 1, 0
 ];
 
+const lightPosition = [10.0, 10.0, 5.0];
+
 function loadShader(gl, source, type) {
 	const shader = gl.createShader(type);
 	gl.shaderSource(shader, source);
@@ -48,26 +50,21 @@ require(["lib/domReady", "lib/gl-matrix", "lib/text!vertex.glsl", "lib/text!frag
 	gl.useProgram(program);
 	gl.clearColor(0.5, 0.5, 0.5, 1.0);
 
-	var t0 = Date.now();
-
-	const viewMatrix = matrix.mat4.create();
-	matrix.mat4.translate(viewMatrix, viewMatrix, matrix.vec3.fromValues(0, 0, 0));
-	matrix.mat4.invert(viewMatrix, viewMatrix);
-
 	const vertexPositionAttribute = gl.getAttribLocation(program, "vertexPosition");
-	const viewMatrixUniform = gl.getUniformLocation(program, "viewMatrix");
 	const resolutionUniform = gl.getUniformLocation(program, "resolution");
+	const lightPositionUniform = gl.getUniformLocation(program, "lightPosition");
 
 	const vertexBuffer = gl.createBuffer();
 	gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
 	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertexPositions), gl.STATIC_DRAW);
 
 	function draw() {
+		const t = Date.now() / 500
+
 		gl.clear(gl.COLOR_BUFFER_BIT);
 
-		gl.uniformMatrix4fv(viewMatrixUniform, false, new Float32Array(viewMatrix));
-
 		gl.uniform2f(resolutionUniform, canvas.width, canvas.height);
+		gl.uniform3f(lightPositionUniform, Math.sin(t) * 20, 20, Math.cos(t) * 20);
 
 		gl.enableVertexAttribArray(vertexPositionAttribute);
 		gl.vertexAttribPointer(vertexPositionAttribute, 3, gl.FLOAT, false, 0, 0);
