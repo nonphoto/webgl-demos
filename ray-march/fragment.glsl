@@ -1,7 +1,7 @@
 precision mediump float;
 
-uniform mat4 viewMatrix;
 uniform vec2 resolution;
+uniform vec3 lightPosition;
 
 struct Sphere {
 	vec3 p;
@@ -19,8 +19,9 @@ struct Ray {
 	vec3 d;
 };
 
-const Light L = Light(vec3(10.0, 10.0, 5.0), 0.99, 0.2);
 const Sphere A = Sphere(vec3(0.0, 0.0, 10.0), 2.0);
+
+Light L = Light(lightPosition, 0.99, 0.2);
 
 vec3 traceRay(in Ray R) {
 	float a = dot(R.d, R.d);
