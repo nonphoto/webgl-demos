@@ -10,9 +10,9 @@ const vertices = [
 
 let layers = [];
 
-function createLayer(gl, vertexSource, fragmentSource) {
-	const vertexShader = loadShader(gl, vertexSource, gl.VERTEX_SHADER);
-	const fragmentShader = loadShader(gl, fragmentSource, gl.FRAGMENT_SHADER);
+function createLayer(gl, util, vertexSource, fragmentSource) {
+	const vertexShader = util.loadShader(gl, vertexSource, gl.VERTEX_SHADER);
+	const fragmentShader = util.loadShader(gl, fragmentSource, gl.FRAGMENT_SHADER);
 
 	const program = gl.createProgram();
 	gl.attachShader(program, vertexShader);
@@ -25,8 +25,8 @@ function createLayer(gl, vertexSource, fragmentSource) {
 	}
 
 	const vertexAttribute = gl.getAttribLocation(program, "a_vertexPosition");
-	const texture = createTexture(gl);
-	const framebuffer = createFramebuffer(gl, texture);
+	const texture = util.createTexture(gl);
+	const framebuffer = util.createFramebuffer(gl, texture);
 
 	return {
 		program: program,
@@ -36,42 +36,7 @@ function createLayer(gl, vertexSource, fragmentSource) {
 	};
 }
 
-function createTexture(gl) {
-	const texture = gl.createTexture();
-	gl.bindTexture(gl.TEXTURE_2D, texture);
-	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-
-	if (typeof image !== "undefined") {
-		gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
-		gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
-	}
-
-	return texture;
-}
-
-function createFramebuffer(gl, texture) {
-	const framebuffer = gl.createFramebuffer();
-	gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffer);
-	gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, texture, 0);
-	return framebuffer;
-}
-
-function loadShader(gl, source, type) {
-	const shader = gl.createShader(type);
-	gl.shaderSource(shader, source);
-	gl.compileShader(shader);
-	if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-		console.error("Shader compilation failed." + gl.getShaderInfoLog(shader));
-		gl.deleteShader(shader);
-		return null;
-	}
-	return shader;
-}
-
-require(["lib/domReady", "lib/text!vertex.glsl", "lib/text!red-circle.glsl", "lib/text!green-circle.glsl", "lib/text!blue-circle.glsl"], function(domReady, vertexSource, redSource, greenSource, blueSource) {
+require(["lib/domReady", "lib/gl-utils", "lib/text!vertex.glsl", "lib/text!red-circle.glsl", "lib/text!green-circle.glsl", "lib/text!blue-circle.glsl"], function(domReady, util, vertexSource, redSource, greenSource, blueSource) {
 	const image = document.getElementById("image");
 	const canvas = document.getElementById("canvas");
 	canvas.width = width;
@@ -88,16 +53,16 @@ require(["lib/domReady", "lib/text!vertex.glsl", "lib/text!red-circle.glsl", "li
 	gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
 	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
 
-	let redLayer = createLayer(gl, vertexSource, redSource);
+	let redLayer = createLayer(gl, util, vertexSource, redSource);
 	layers.push(redLayer);
 
-	let greenLayer = createLayer(gl, vertexSource, greenSource);
+	let greenLayer = createLayer(gl, util, vertexSource, greenSource);
 	layers.push(greenLayer);
 
-	let blueLayer = createLayer(gl, vertexSource, blueSource);
+	let blueLayer = createLayer(gl, util, vertexSource, blueSource);
 	layers.push(blueLayer);
 
-	let sourceTexture = createTexture(gl, image);
+	let sourceTexture = util.createTexture(gl, image);
 	for (let i = 0; i < layers.length; i++) {
 		const layer = layers[i];
 		gl.useProgram(layer.program);

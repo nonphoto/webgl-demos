@@ -29,30 +29,7 @@ const elements = [
 	0, 4, 5, 0, 1, 5
 ];
 
-function makeProjectionMatrix(fieldOfViewInRadians, aspectRatio, near, far) {
-  const f = 1.0 / Math.tan(fieldOfViewInRadians / 2);
-  const rangeInverse = 1 / (near - far);
-  return [
-    f / aspectRatio, 0, 0, 0,
-    0, f, 0, 0,
-    0, 0, (near + far) * rangeInverse, -1,
-    0, 0, near * far * rangeInverse * 2, 0
-  ];
-}
-
-function loadShader(gl, source, type) {
-	const shader = gl.createShader(type);
-	gl.shaderSource(shader, source);
-	gl.compileShader(shader);
-	if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-		console.error("Shader compilation failed." + gl.getShaderInfoLog(shader));
-		gl.deleteShader(shader);
-		return null;
-	}
-	return shader;
-}
-
-require(["lib/domReady", "lib/gl-matrix", "lib/text!vertex.glsl", "lib/text!fragment.glsl"], function(domReady, matrix, vertexSource, fragmentSource) {
+require(["lib/domReady", "lib/gl-utils", "lib/gl-matrix", "lib/text!vertex.glsl", "lib/text!fragment.glsl"], function(domReady, util, matrix, vertexSource, fragmentSource) {
 	const canvas = document.getElementById("canvas");
 	canvas.width = window.innerWidth;
 	canvas.height = window.innerHeight;
@@ -65,8 +42,8 @@ require(["lib/domReady", "lib/gl-matrix", "lib/text!vertex.glsl", "lib/text!frag
 	}
 
 	// Initialize shader program.
-	const vertexShader = loadShader(gl, vertexSource, gl.VERTEX_SHADER);
-	const fragmentShader = loadShader(gl, fragmentSource, gl.FRAGMENT_SHADER);
+	const vertexShader = util.loadShader(gl, vertexSource, gl.VERTEX_SHADER);
+	const fragmentShader = util.loadShader(gl, fragmentSource, gl.FRAGMENT_SHADER);
 
 	program = gl.createProgram();
 	gl.attachShader(program, vertexShader);
@@ -85,14 +62,14 @@ require(["lib/domReady", "lib/gl-matrix", "lib/text!vertex.glsl", "lib/text!frag
 
 	var modelMatrix = matrix.mat4.create();
 	matrix.mat4.scale(modelMatrix, modelMatrix, matrix.vec3.fromValues(5, 5, 5));
-	
+
 	const viewMatrix = matrix.mat4.create();
 	matrix.mat4.translate(viewMatrix, viewMatrix, matrix.vec3.fromValues(0, 0, 20));
 	matrix.mat4.invert(viewMatrix, viewMatrix);
-	
+
 	const fov = Math.PI * 0.5;
 	const aspectRatio = window.innerWidth / window.innerHeight;
-	const projectionMatrix = makeProjectionMatrix(fov, aspectRatio, 1, 50);
+	const projectionMatrix = util.makeProjectionMatrix(fov, aspectRatio, 1, 50);
 
 	const vertexPositionAttribute = gl.getAttribLocation(program, "aVertexPosition");
 	const vertexColorAttribute = gl.getAttribLocation(program, "aVertexColor");

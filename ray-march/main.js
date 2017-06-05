@@ -5,19 +5,7 @@ const vertexPositions = [
 	1, 1, 0
 ];
 
-function loadShader(gl, source, type) {
-	const shader = gl.createShader(type);
-	gl.shaderSource(shader, source);
-	gl.compileShader(shader);
-	if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-		console.error("Shader compilation failed." + gl.getShaderInfoLog(shader));
-		gl.deleteShader(shader);
-		return null;
-	}
-	return shader;
-}
-
-require(["lib/domReady", "lib/gl-matrix", "lib/text!vertex.glsl", "lib/text!fragment.glsl"], function(domReady, matrix, vertexSource, fragmentSource) {
+require(["lib/domReady", "lib/gl-utils", "lib/gl-matrix", "lib/text!vertex.glsl", "lib/text!fragment.glsl"], function(domReady, util, matrix, vertexSource, fragmentSource) {
 	const canvas = document.getElementById("canvas");
 	canvas.width = 800;
 	canvas.height = 600;
@@ -32,8 +20,8 @@ require(["lib/domReady", "lib/gl-matrix", "lib/text!vertex.glsl", "lib/text!frag
 	gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
 
 	// Initialize shader program.
-	const vertexShader = loadShader(gl, vertexSource, gl.VERTEX_SHADER);
-	const fragmentShader = loadShader(gl, fragmentSource, gl.FRAGMENT_SHADER);
+	const vertexShader = util.loadShader(gl, vertexSource, gl.VERTEX_SHADER);
+	const fragmentShader = util.loadShader(gl, fragmentSource, gl.FRAGMENT_SHADER);
 
 	program = gl.createProgram();
 	gl.attachShader(program, vertexShader);
