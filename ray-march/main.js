@@ -12,28 +12,14 @@ require(["lib/domReady", "lib/gl-utils", "lib/gl-matrix", "lib/text!vertex.glsl"
 	canvas.width = 800;
 	canvas.height = 600;
 
-	var gl = null;
-	gl = canvas.getContext("webgl") || canvas.getContext("experimental-webgl");
-	if (!gl) {
-		alert("Unable to initialize WebGL. Maybe your browser doesn't support it.");
-		return
-	}
+	const gl = util.createContext(canvas);
 
 	gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
 
-	// Initialize shader program.
-	const vertexShader = util.loadShader(gl, vertexSource, gl.VERTEX_SHADER);
-	const fragmentShader = util.loadShader(gl, fragmentSource, gl.FRAGMENT_SHADER);
+	const vertexShader = util.createShader(gl, vertexSource, gl.VERTEX_SHADER);
+	const fragmentShader = util.createShader(gl, fragmentSource, gl.FRAGMENT_SHADER);
 
-	program = gl.createProgram();
-	gl.attachShader(program, vertexShader);
-	gl.attachShader(program, fragmentShader);
-	gl.linkProgram(program);
-
-	if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
-		console.error("Unable to initialize the shader program: " + gl.getProgramInfoLog(program));
-		return;
-	}
+	const program = util.createProgram(gl, vertexShader, fragmentShader);
 
 	gl.useProgram(program);
 	gl.clearColor(0.5, 0.5, 0.5, 1.0);

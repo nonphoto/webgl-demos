@@ -34,26 +34,10 @@ require(["lib/domReady", "lib/gl-utils", "lib/gl-matrix", "lib/text!vertex.glsl"
 	canvas.width = window.innerWidth;
 	canvas.height = window.innerHeight;
 
-	var gl = null;
-	gl = canvas.getContext("webgl") || canvas.getContext("experimental-webgl");
-	if (!gl) {
-		console.error("Unable to initialize WebGL. Maybe your browser doesn't support it.");
-		return
-	}
-
-	// Initialize shader program.
-	const vertexShader = util.loadShader(gl, vertexSource, gl.VERTEX_SHADER);
-	const fragmentShader = util.loadShader(gl, fragmentSource, gl.FRAGMENT_SHADER);
-
-	program = gl.createProgram();
-	gl.attachShader(program, vertexShader);
-	gl.attachShader(program, fragmentShader);
-	gl.linkProgram(program);
-
-	if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
-		console.error("Unable to initialize the shader program: " + gl.getProgramInfoLog(program));
-		return;
-	}
+	const gl = util.createContext(canvas)
+	const vertexShader = util.createShader(gl, vertexSource, gl.VERTEX_SHADER);
+	const fragmentShader = util.createShader(gl, fragmentSource, gl.FRAGMENT_SHADER);
+	const program = util.createProgram(gl, vertexShader, fragmentShader);
 
 	gl.useProgram(program);
 	gl.enable(gl.DEPTH_TEST);
@@ -69,7 +53,7 @@ require(["lib/domReady", "lib/gl-utils", "lib/gl-matrix", "lib/text!vertex.glsl"
 
 	const fov = Math.PI * 0.5;
 	const aspectRatio = window.innerWidth / window.innerHeight;
-	const projectionMatrix = util.makeProjectionMatrix(fov, aspectRatio, 1, 50);
+	const projectionMatrix = util.createProjectionMatrix(fov, aspectRatio, 1, 50);
 
 	const vertexPositionAttribute = gl.getAttribLocation(program, "aVertexPosition");
 	const vertexColorAttribute = gl.getAttribLocation(program, "aVertexColor");
